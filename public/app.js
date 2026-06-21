@@ -225,7 +225,27 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchHistory();
   initUIListeners();
   initThreeScene();
+  checkSession();
 });
+
+function checkSession() {
+  const landingWrapper = document.getElementById('landingWrapper');
+  const dashboardWrapper = document.getElementById('dashboardWrapper');
+  const authWrapper = document.getElementById('authWrapper');
+  
+  const sessionActive = localStorage.getItem('pm_session_active') === 'true';
+  if (sessionActive) {
+    if (landingWrapper) landingWrapper.classList.add('hidden');
+    if (dashboardWrapper) dashboardWrapper.classList.remove('hidden');
+    if (authWrapper) {
+      authWrapper.classList.add('hidden');
+      authWrapper.classList.remove('active');
+    }
+  } else {
+    if (landingWrapper) landingWrapper.classList.remove('hidden');
+    if (dashboardWrapper) dashboardWrapper.classList.add('hidden');
+  }
+}
 
 const statusAlert = document.getElementById('statusAlert');
 const alertMessage = document.getElementById('alertMessage');
@@ -492,6 +512,168 @@ function initUIListeners() {
   tempSlider.addEventListener('input', () => {
     sliderValue.textContent = tempSlider.value;
   });
+
+  // Access Portal & Authentication Dialogs
+  const landingLoginBtn = document.getElementById('landingLoginBtn');
+  const landingSignupBtn = document.getElementById('landingSignupBtn');
+  const landingWrapper = document.getElementById('landingWrapper');
+  const dashboardWrapper = document.getElementById('dashboardWrapper');
+  const authWrapper = document.getElementById('authWrapper');
+  
+  const loginModalCloseBtn = document.getElementById('loginModalCloseBtn');
+  const signupModalCloseBtn = document.getElementById('signupModalCloseBtn');
+  
+  const toSignupBtn = document.getElementById('toSignupBtn');
+  const toLoginBtn = document.getElementById('toLoginBtn');
+  
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  const openAuthModal = (showLogin) => {
+    if (!authWrapper) return;
+    
+    if (showLogin) {
+      document.getElementById('loginCard').classList.remove('hidden');
+      document.getElementById('signupCard').classList.add('hidden');
+    } else {
+      document.getElementById('signupCard').classList.remove('hidden');
+      document.getElementById('loginCard').classList.add('hidden');
+    }
+    
+    authWrapper.classList.remove('hidden');
+    setTimeout(() => {
+      authWrapper.classList.add('active');
+      const targetInput = showLogin ? document.getElementById('loginEmail') : document.getElementById('signupUsername');
+      if (targetInput) targetInput.focus();
+    }, 10);
+  };
+
+  if (landingLoginBtn) {
+    landingLoginBtn.addEventListener('click', () => openAuthModal(true));
+  }
+
+  if (landingSignupBtn) {
+    landingSignupBtn.addEventListener('click', () => openAuthModal(false));
+  }
+
+  const closeAuthModal = () => {
+    if (authWrapper) {
+      authWrapper.classList.remove('active');
+      setTimeout(() => {
+        authWrapper.classList.add('hidden');
+      }, 400);
+    }
+  };
+
+  if (loginModalCloseBtn) loginModalCloseBtn.addEventListener('click', closeAuthModal);
+  if (signupModalCloseBtn) signupModalCloseBtn.addEventListener('click', closeAuthModal);
+
+  if (toSignupBtn) {
+    toSignupBtn.addEventListener('click', () => {
+      document.getElementById('loginCard').classList.add('hidden');
+      document.getElementById('signupCard').classList.remove('hidden');
+    });
+  }
+
+  if (toLoginBtn) {
+    toLoginBtn.addEventListener('click', () => {
+      document.getElementById('signupCard').classList.add('hidden');
+      document.getElementById('loginCard').classList.remove('hidden');
+    });
+  }
+
+  const performMockLogin = (type) => {
+    const screenLoader = document.getElementById('screenLoader');
+    if (screenLoader) {
+      screenLoader.classList.add('active');
+      screenLoader.innerHTML = `
+        <div style="text-align: center; color: var(--text-white); font-family: var(--font-display);">
+          <div class="typing-cursor" style="width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 1rem auto;"></div>
+          <p style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.9rem;">Connecting to Secure Keyring...</p>
+        </div>
+      `;
+    }
+    
+    setTimeout(() => {
+      if (screenLoader) {
+        screenLoader.innerHTML = `
+          <div style="text-align: center; color: var(--text-white); font-family: var(--font-display);">
+            <div class="typing-cursor" style="width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 1rem auto; background-color: var(--provider-accent);"></div>
+            <p style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.9rem;">Initializing Tactile Dashboard...</p>
+          </div>
+        `;
+      }
+      
+      setTimeout(() => {
+        if (screenLoader) screenLoader.classList.remove('active');
+        closeAuthModal();
+        
+        localStorage.setItem('pm_session_active', 'true');
+        
+        if (landingWrapper) landingWrapper.classList.add('hidden');
+        if (dashboardWrapper) {
+          dashboardWrapper.classList.remove('hidden');
+          dashboardWrapper.style.opacity = '0';
+          setTimeout(() => {
+            dashboardWrapper.style.transition = 'opacity 0.6s ease';
+            dashboardWrapper.style.opacity = '1';
+          }, 10);
+        }
+        
+        showAlert(`Successfully authenticated via ${type}. Welcome back!`, "success");
+      }, 1000);
+    }, 1000);
+  };
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      performMockLogin('Credentials');
+    });
+  }
+
+  if (signupForm) {
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      performMockLogin('Credentials Registration');
+    });
+  }
+
+  const socialBtns = [
+    document.getElementById('googleLoginBtn'),
+    document.getElementById('githubLoginBtn'),
+    document.getElementById('googleSignupBtn'),
+    document.getElementById('githubSignupBtn')
+  ];
+
+  socialBtns.forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', () => {
+        const id = btn.id;
+        const providerName = id.toLowerCase().includes('google') ? 'Google OAuth' : 'GitHub OAuth';
+        performMockLogin(providerName);
+      });
+    }
+  });
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('pm_session_active');
+      
+      if (dashboardWrapper) dashboardWrapper.classList.add('hidden');
+      if (landingWrapper) {
+        landingWrapper.classList.remove('hidden');
+        landingWrapper.style.opacity = '0';
+        setTimeout(() => {
+          landingWrapper.style.transition = 'opacity 0.6s ease';
+          landingWrapper.style.opacity = '1';
+        }, 10);
+      }
+      
+      showAlert("Logged out of prompt environment.", "success");
+    });
+  }
 
   // Clear button
   clearBtn.addEventListener('click', () => {

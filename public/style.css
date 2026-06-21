@@ -931,9 +931,8 @@ body.reduced-motion .hologram-card {
    ---------------------------------------------------- */
 .left-history-btn {
   position: fixed;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 2.5rem;
+  top: 2rem;
   z-index: 90;
   background: var(--btn-raised-bg);
   border: 1px solid rgba(255, 255, 255, 0.8);
@@ -950,12 +949,12 @@ body.reduced-motion .hologram-card {
 }
 
 .left-history-btn:hover {
-  transform: translateY(-50%) scale(1.05);
+  transform: scale(1.05);
   box-shadow: 2px 4px 10px rgba(0,0,0,0.35), -1px -1px 3px rgba(255,255,255,0.8);
 }
 
 .left-history-btn:active {
-  transform: translateY(-50%) scale(0.98);
+  transform: scale(0.98);
   box-shadow: inset 1px 1px 3px rgba(0,0,0,0.15);
 }
 
@@ -1188,3 +1187,240 @@ body.reduced-motion .hologram-card {
     width: 100%;
   }
 }
+
+/* ----------------------------------------------------
+   13. LANDING PAGE, SOCIAL AUTH & UTILITY OVERLAYS
+   ---------------------------------------------------- */
+.hidden {
+  display: none !important;
+}
+
+#landingWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: radial-gradient(circle at center, rgba(14, 14, 18, 0.45) 0%, rgba(14, 14, 18, 0.95) 100%);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.landing-panel {
+  background: var(--metal-bg);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 3px solid rgba(0, 0, 0, 0.3);
+  border-right: 2px solid rgba(0, 0, 0, 0.25);
+  border-radius: 24px;
+  padding: 3.5rem 2.5rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 480px;
+  width: 90%;
+  gap: 1.8rem;
+  transition: all 0.3s ease;
+  animation: modal-zoom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.landing-btn-group {
+  display: flex;
+  gap: 1.25rem;
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .landing-btn-group {
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+}
+
+.access-btn {
+  flex: 1;
+  padding: 1.1rem;
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+/* Primary Sign Up (Gradient) style */
+.access-btn.primary-btn {
+  background: linear-gradient(135deg, #00f5ff 0%, #7b2fff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 3.5px solid rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(123, 47, 255, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.access-btn.primary-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 245, 255, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  filter: brightness(1.1);
+}
+
+.access-btn.primary-btn:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 2px 10px rgba(0, 245, 255, 0.3);
+}
+
+/* Secondary Log In (Glassmorphic) style */
+.access-btn.secondary-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-bottom: 3px solid rgba(0, 0, 0, 0.3);
+  color: var(--cyan-glow);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.access-btn.secondary-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(0, 245, 255, 0.85);
+  color: #ffffff;
+  box-shadow: 0 8px 25px rgba(0, 245, 255, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.access-btn.secondary-btn:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 2px 10px rgba(0, 245, 255, 0.1);
+}
+
+/* Social Separator */
+.social-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: rgba(27, 27, 34, 0.5);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 1.25rem 0 0.85rem 0;
+  width: 100%;
+}
+
+.social-divider::before,
+.social-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1.5px solid rgba(0, 0, 0, 0.08);
+}
+
+.social-divider:not(:empty)::before {
+  margin-right: .6em;
+}
+
+.social-divider:not(:empty)::after {
+  margin-left: .6em;
+}
+
+/* Social login buttons */
+.social-auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
+.social-btn {
+  background: var(--btn-raised-bg);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  color: #33333f;
+  padding: 0.6rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-family: var(--font-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 1.5px 1.5px 4px rgba(0,0,0,0.1), -1px -1px 2px rgba(255,255,255,0.7);
+  transition: all 0.2s ease;
+}
+
+.social-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 2px 3px 6px rgba(0,0,0,0.12), -1px -1px 2px rgba(255,255,255,0.8);
+}
+
+.social-btn:active {
+  transform: translateY(0);
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
+}
+
+.social-btn svg {
+  flex-shrink: 0;
+}
+
+.google-btn:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f9 100%);
+  border-color: rgba(66, 133, 244, 0.35);
+}
+
+.github-btn:hover {
+  background: linear-gradient(180deg, #24292e 0%, #1c1f23 100%);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Overlay alignment adjustments for login/signup popup modal */
+.auth-wrapper.modal-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-wrapper.modal-overlay.active {
+  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.auth-wrapper .auth-card {
+  height: auto;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-wrapper.modal-overlay.active .auth-card {
+  transform: scale(1) translateY(0);
+}
+
