@@ -29,195 +29,343 @@
   <!-- Background Three.js canvas (renders floating glass icon blocks) -->
   <canvas id="canvas3d"></canvas>
 
-  <!-- Top bar configuration utility controls -->
-  <div class="utility-bar" role="toolbar" aria-label="Application settings">
-    <!-- Reduced Motion -->
-    <button class="utility-btn" id="motionToggle" title="Toggle Motion Effects" aria-label="Toggle animations and background motion">
-      <svg id="motionIcon" viewBox="0 0 24 24">
-        <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L18 8"></path>
-        <path d="M16 3h5v5"></path>
-      </svg>
-    </button>
-    <!-- History drawer -->
-    <button class="utility-btn" id="historyToggle" title="View Recent Prompts" aria-label="Open history drawer">
+  <!-- Dashboard elements wrapper -->
+  <div id="dashboardWrapper" class="hidden">
+    <!-- Left fixed history toggle -->
+    <button class="left-history-btn" id="leftHistoryBtn" title="Search/Prompt History" aria-label="Open search and prompt history">
       <svg viewBox="0 0 24 24">
-        <path d="M12 8v4l3 3"></path>
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
         <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
       </svg>
     </button>
-    <!-- API credentials key configuration -->
-    <button class="utility-btn" id="settingsToggle" title="API Credentials" aria-label="Configure API Keys">
-      <svg viewBox="0 0 24 24">
-        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
-      </svg>
-    </button>
-  </div>
 
-  <!-- Header Centered logo / Tagline -->
-  <header>
-    <div class="logo-container">
-      <h1 id="logoText">PromptMaster</h1>
-      <span class="logo-underline" aria-hidden="true"></span>
+    <!-- Top bar configuration utility controls -->
+    <div class="utility-bar" role="toolbar" aria-label="Application settings">
+      <!-- Reduced Motion -->
+      <button class="utility-btn" id="motionToggle" title="Toggle Motion Effects" aria-label="Toggle animations and background motion">
+        <svg id="motionIcon" viewBox="0 0 24 24">
+          <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L18 8"></path>
+          <path d="M16 3h5v5"></path>
+        </svg>
+      </button>
+      <!-- History drawer -->
+      <button class="utility-btn" id="historyToggle" title="View Recent Prompts" aria-label="Open history drawer">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 8v4l3 3"></path>
+          <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
+        </svg>
+      </button>
+      <!-- API credentials key configuration -->
+      <button class="utility-btn" id="settingsToggle" title="API Credentials" aria-label="Configure API Keys">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+        </svg>
+      </button>
+      <!-- Logout button -->
+      <button class="utility-btn" id="logoutBtn" title="Logout" aria-label="Log out of application">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
     </div>
-    <div class="tagline">Input Transformation &mdash; [PRECISION PROMPT]</div>
-  </header>
 
-  <!-- Main Workspace Area -->
-  <main>
-    <!-- Top info / Error alert banner -->
-    <div class="alert-banner" id="statusAlert" role="alert">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      <span id="alertMessage">Configure API keys or keep empty to trigger mockup simulation.</span>
-    </div>
+    <!-- Header Centered logo / Tagline -->
+    <header>
+      <div class="logo-container">
+        <h1 id="logoText">PromptMaster</h1>
+        <span class="logo-underline" aria-hidden="true"></span>
+      </div>
+      <div class="tagline">Input Transformation &mdash; [PRECISION PROMPT]</div>
+    </header>
 
-    <!-- Dual holographic/skeuomorphic layout cards -->
-    <div class="cards-container">
-      
-      <!-- Input Card (Left) -->
-      <section class="hologram-card input-card" id="inputCard" aria-labelledby="input-title">
-        <div class="card-sheen"></div>
-        <div class="card-header">
-          <h2 class="card-title" id="input-title">RAW THOUGHT</h2>
-        </div>
+    <!-- Main Workspace Area -->
+    <main>
+      <!-- Top info / Error alert banner -->
+      <div class="alert-banner" id="statusAlert" role="alert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="alertMessage">Configure API keys or keep empty to trigger mockup simulation.</span>
+      </div>
+
+      <!-- Dual holographic/skeuomorphic layout cards -->
+      <div class="cards-container">
         
-        <!-- Target model switcher control (neatly styled neumorphic switcher) -->
-        <div class="provider-toggle" role="radiogroup" aria-label="Target AI model framing style">
-          <button class="provider-btn active" role="radio" aria-checked="true" data-provider="chatgpt">ChatGPT</button>
-          <button class="provider-btn" role="radio" aria-checked="false" data-provider="claude">Claude</button>
-          <button class="provider-btn" role="radio" aria-checked="false" data-provider="gemini">Gemini</button>
-        </div>
-
-        <div class="input-area-wrapper">
-          <textarea id="rawInput" placeholder="Build a python script to fetch stock tickers and generate a report." aria-label="Raw prompt thoughts"></textarea>
-        </div>
-
-        <!-- Skeuomorphic control row -->
-        <div class="card-controls-row">
-          <button class="control-btn clear-btn" id="clearBtn" aria-label="Clear input text">CLEAR</button>
-          <button class="control-btn save-btn" id="saveBtn" aria-label="Save prompt run manually">SAVE</button>
-          <!-- Enhance/Generate main action button -->
-          <button class="control-btn generate-btn" id="enhanceBtn" aria-label="Generate precision prompt">GENERATE</button>
-        </div>
-
-        <!-- Temperature creativity slider -->
-        <div class="slider-wrapper">
-          <div class="slider-header">
-            <span class="slider-label">CREATIVITY (TEMP)</span>
-            <span class="slider-value" id="sliderValue">0.5</span>
+        <!-- Input Card (Left) -->
+        <section class="hologram-card input-card" id="inputCard" aria-labelledby="input-title">
+          <div class="card-sheen"></div>
+          <div class="card-header">
+            <h2 class="card-title" id="input-title">RAW THOUGHT</h2>
           </div>
-          <div class="slider-track-container">
-            <input type="range" class="neumorphic-slider" id="tempSlider" min="0" max="1" step="0.1" value="0.5" aria-label="Prompt creativity slider">
+          
+          <!-- Target model switcher control (neatly styled neumorphic switcher) -->
+          <div class="provider-toggle" role="radiogroup" aria-label="Target AI model framing style">
+            <button class="provider-btn active" role="radio" aria-checked="true" data-provider="chatgpt">ChatGPT</button>
+            <button class="provider-btn" role="radio" aria-checked="false" data-provider="claude">Claude</button>
+            <button class="provider-btn" role="radio" aria-checked="false" data-provider="gemini">Gemini</button>
           </div>
-        </div>
-      </section>
 
-      <!-- Output Card (Right) -->
-      <section class="hologram-card output-card" id="outputCard" aria-labelledby="output-title">
-        <div class="card-sheen"></div>
-        <div class="card-header">
-          <h2 class="card-title" id="output-title">PRECISION PROMPT</h2>
-          <button class="copy-btn" id="copyBtn" aria-label="Copy output prompt to clipboard">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="copyIcon">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          <div class="input-area-wrapper">
+            <textarea id="rawInput" placeholder="Build a python script to fetch stock tickers and generate a report." aria-label="Raw prompt thoughts"></textarea>
+          </div>
+
+          <!-- Skeuomorphic control row -->
+          <div class="card-controls-row">
+            <button class="control-btn clear-btn" id="clearBtn" aria-label="Clear input text">CLEAR</button>
+            <button class="control-btn save-btn" id="saveBtn" aria-label="Save prompt run manually">SAVE</button>
+            <!-- Enhance/Generate main action button -->
+            <button class="control-btn generate-btn" id="enhanceBtn" aria-label="Generate precision prompt">GENERATE</button>
+          </div>
+
+          <!-- Temperature creativity slider -->
+          <div class="slider-wrapper">
+            <div class="slider-header">
+              <span class="slider-label">CREATIVITY (TEMP)</span>
+              <span class="slider-value" id="sliderValue">0.5</span>
+            </div>
+            <div class="slider-track-container">
+              <input type="range" class="neumorphic-slider" id="tempSlider" min="0" max="1" step="0.1" value="0.5" aria-label="Prompt creativity slider">
+            </div>
+          </div>
+        </section>
+
+        <!-- Output Card (Right) -->
+        <section class="hologram-card output-card" id="outputCard" aria-labelledby="output-title">
+          <div class="card-sheen"></div>
+          <div class="card-header">
+            <h2 class="card-title" id="output-title">PRECISION PROMPT</h2>
+            <button class="copy-btn" id="copyBtn" aria-label="Copy output prompt to clipboard">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="copyIcon">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="copyText">Copy</span>
+            </button>
+          </div>
+
+          <!-- Default placeholder state -->
+          <div class="output-placeholder" id="outputPlaceholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
             </svg>
-            <span id="copyText">Copy</span>
+            <p>Your optimized structured prompt will appear here.<br>Provide input on the left and click "GENERATE".</p>
+          </div>
+
+          <!-- Output display window -->
+          <div class="output-display" id="outputDisplay" role="region" aria-live="polite"></div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Credential configuration overlay modal -->
+    <div class="modal-overlay" id="settingsModal" aria-hidden="true" role="dialog">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 class="modal-title">API Credentials</h2>
+          <button class="modal-close" id="modalCloseBtn" aria-label="Close settings dialog">
+            <svg viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
 
-        <!-- Default placeholder state -->
-        <div class="output-placeholder" id="outputPlaceholder">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="16 18 22 12 16 6"></polyline>
-            <polyline points="8 6 2 12 8 18"></polyline>
-          </svg>
-          <p>Your optimized structured prompt will appear here.<br>Provide input on the left and click "GENERATE".</p>
-        </div>
+        <!-- Settings Forms -->
+        <form id="apiSettingsForm" onsubmit="event.preventDefault();">
+          <div class="form-group">
+            <label class="form-label" for="keyOpenAI">OpenAI API Key</label>
+            <div class="form-input-container">
+              <input class="form-input" type="password" id="keyOpenAI" placeholder="sk-..." autocomplete="off">
+              <button type="button" class="password-toggle-btn" data-target="keyOpenAI" aria-label="Show API Key">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+            <div class="form-hint">Used for ChatGPT optimizations. Saved in client browser localStorage.</div>
+          </div>
 
-        <!-- Output display window -->
-        <div class="output-display" id="outputDisplay" role="region" aria-live="polite"></div>
-      </section>
+          <div class="form-group">
+            <label class="form-label" for="keyGemini">Gemini API Key</label>
+            <div class="form-input-container">
+              <input class="form-input" type="password" id="keyGemini" placeholder="AIzaSy..." autocomplete="off">
+              <button type="button" class="password-toggle-btn" data-target="keyGemini" aria-label="Show API Key">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+            <div class="form-hint">Used for Gemini models. Saved in client browser localStorage.</div>
+          </div>
 
+          <div class="form-group">
+            <label class="form-label" for="keyAnthropic">Anthropic API Key</label>
+            <div class="form-input-container">
+              <input class="form-input" type="password" id="keyAnthropic" placeholder="sk-ant-..." autocomplete="off">
+              <button type="button" class="password-toggle-btn" data-target="keyAnthropic" aria-label="Show API Key">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+            <div class="form-hint">Used for Claude optimizations. Saved in client browser localStorage.</div>
+          </div>
+
+          <div class="form-group" style="display:none;">
+            <label class="form-label" for="proxyAnthropic">Anthropic CORS Proxy (Optional)</label>
+            <input class="form-input" type="text" id="proxyAnthropic" placeholder="https://api.allorigins.win/raw?url=">
+            <div class="form-hint">Automatically handled by Express backend.</div>
+          </div>
+
+          <button type="button" class="modal-save-btn" id="saveSettingsBtn">Save Configuration</button>
+        </form>
+      </div>
     </div>
-  </main>
 
-  <!-- Credential configuration overlay modal -->
-  <div class="modal-overlay" id="settingsModal" aria-hidden="true" role="dialog">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h2 class="modal-title">API Credentials</h2>
-        <button class="modal-close" id="modalCloseBtn" aria-label="Close settings dialog">
+    <!-- Sliding Drawer (History List) -->
+    <div class="drawer" id="historyDrawer" aria-hidden="true">
+      <div class="drawer-header">
+        <h2 class="drawer-title">Saved Runs</h2>
+        <button class="drawer-close" id="drawerCloseBtn" aria-label="Close history drawer">
           <svg viewBox="0 0 24 24">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
       </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">No records stored yet. Optimize some prompts!</div>
+      </div>
+    </div>
 
-      <!-- Settings Forms -->
-      <form id="apiSettingsForm" onsubmit="event.preventDefault();">
-        <div class="form-group">
-          <label class="form-label" for="keyOpenAI">OpenAI API Key</label>
-          <div class="form-input-container">
-            <input class="form-input" type="password" id="keyOpenAI" placeholder="sk-..." autocomplete="off">
-            <button type="button" class="password-toggle-btn" data-target="keyOpenAI" aria-label="Show API Key">
-              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-          </div>
-          <div class="form-hint">Used for ChatGPT optimizations. Saved in client browser localStorage.</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="keyGemini">Gemini API Key</label>
-          <div class="form-input-container">
-            <input class="form-input" type="password" id="keyGemini" placeholder="AIzaSy..." autocomplete="off">
-            <button type="button" class="password-toggle-btn" data-target="keyGemini" aria-label="Show API Key">
-              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-          </div>
-          <div class="form-hint">Used for Gemini models. Saved in client browser localStorage.</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="keyAnthropic">Anthropic API Key</label>
-          <div class="form-input-container">
-            <input class="form-input" type="password" id="keyAnthropic" placeholder="sk-ant-..." autocomplete="off">
-            <button type="button" class="password-toggle-btn" data-target="keyAnthropic" aria-label="Show API Key">
-              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-          </div>
-          <div class="form-hint">Used for Claude optimizations. Saved in client browser localStorage.</div>
-        </div>
-
-        <div class="form-group" style="display:none;">
-          <label class="form-label" for="proxyAnthropic">Anthropic CORS Proxy (Optional)</label>
-          <input class="form-input" type="text" id="proxyAnthropic" placeholder="https://api.allorigins.win/raw?url=">
-          <div class="form-hint">Automatically handled by Express backend.</div>
-        </div>
-
-        <button type="button" class="modal-save-btn" id="saveSettingsBtn">Save Configuration</button>
-      </form>
+    <!-- Left Sliding Drawer (Server Prompt History List) -->
+    <div class="left-drawer" id="leftHistoryDrawer" aria-hidden="true">
+      <div class="left-drawer-header">
+        <h2 class="left-drawer-title">Prompt History</h2>
+        <button class="left-drawer-close" id="leftDrawerCloseBtn" aria-label="Close prompt history drawer">
+          <svg viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="left-history-list" id="leftHistoryList">
+        <div class="history-empty">No history yet — your optimized prompts will appear here</div>
+      </div>
+      <div class="left-history-footer">
+        <button class="left-history-clear-btn" id="leftHistoryClearBtn" aria-label="Clear all prompt history">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Clear all
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Sliding Drawer (History List) -->
-  <div class="drawer" id="historyDrawer" aria-hidden="true">
-    <div class="drawer-header">
-      <h2 class="drawer-title">Saved Runs</h2>
-      <button class="drawer-close" id="drawerCloseBtn" aria-label="Close history drawer">
-        <svg viewBox="0 0 24 24">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
+  <!-- Auth Forms Wrapper -->
+  <div id="authWrapper" class="auth-wrapper">
+    <header class="auth-header">
+      <div class="logo-container">
+        <h1>PromptMaster</h1>
+        <span class="logo-underline" aria-hidden="true"></span>
+      </div>
+      <div class="tagline">System Portal &mdash; [SECURE ACCESS]</div>
+    </header>
+
+    <!-- Login Card -->
+    <section class="hologram-card auth-card" id="loginCard" aria-labelledby="login-title">
+      <div class="card-header">
+        <h2 class="card-title" id="login-title">USER LOGIN</h2>
+      </div>
+
+      <div class="alert-banner" id="loginAlert" role="alert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
-      </button>
-    </div>
-    <div class="history-list" id="historyList">
-      <div class="history-empty">No records stored yet. Optimize some prompts!</div>
-    </div>
+        <span id="loginAlertMessage"></span>
+      </div>
+
+      <form id="loginForm" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Email Address</label>
+          <div class="form-input-container">
+            <input class="form-input" type="email" id="loginEmail" placeholder="name@domain.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <div class="form-input-container">
+            <input class="form-input" type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            <button type="button" class="password-toggle-btn" data-target="loginPassword" aria-label="Show Password">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="modal-save-btn" id="loginSubmitBtn">ENTER WORKSPACE</button>
+      </form>
+
+      <div class="auth-switch">
+        <span>New to PromptMaster?</span>
+        <button type="button" class="switch-link-btn" id="toSignupBtn">Create an account</button>
+      </div>
+    </section>
+
+    <!-- Signup Card (hidden by default) -->
+    <section class="hologram-card auth-card hidden" id="signupCard" aria-labelledby="signup-title">
+      <div class="card-header">
+        <h2 class="card-title" id="signup-title">CREATE ACCOUNT</h2>
+      </div>
+
+      <div class="alert-banner" id="signupAlert" role="alert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="signupAlertMessage"></span>
+      </div>
+
+      <form id="signupForm" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label class="form-label" for="signupUsername">Username</label>
+          <div class="form-input-container">
+            <input class="form-input" type="text" id="signupUsername" placeholder="prompt_master" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupEmail">Email Address</label>
+          <div class="form-input-container">
+            <input class="form-input" type="email" id="signupEmail" placeholder="name@domain.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupPassword">Password</label>
+          <div class="form-input-container">
+            <input class="form-input" type="password" id="signupPassword" placeholder="••••••••" required autocomplete="new-password">
+            <button type="button" class="password-toggle-btn" data-target="signupPassword" aria-label="Show Password">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+          <div class="form-hint" style="color: rgba(27, 27, 34, 0.5);">Must be at least 6 characters long.</div>
+        </div>
+
+        <button type="submit" class="modal-save-btn" id="signupSubmitBtn">REGISTER & ACTIVATE</button>
+      </form>
+
+      <div class="auth-switch">
+        <span>Already registered?</span>
+        <button type="button" class="switch-link-btn" id="toLoginBtn">Log in to your account</button>
+      </div>
+    </section>
   </div>
 
   <!-- Screen space loader -->

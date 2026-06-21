@@ -222,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.className = 'theme-chatgpt';
   loadKeys();
   loadHistory();
+  fetchHistory();
   initUIListeners();
   initThreeScene();
 });
@@ -325,6 +326,140 @@ function escapeHTML(str) {
 }
 
 // --------------------------------------------------
+// SERVER HISTORY API INTERFACE
+// --------------------------------------------------
+let serverHistory = [];
+
+async function fetchHistory() {
+  try {
+    const response = await fetch('/api/history');
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    serverHistory = await response.json();
+    renderServerHistory();
+  } catch (error) {
+    // Fail silently
+  }
+}
+
+function getRelativeTime(timestamp) {
+  const elapsed = Date.now() - new Date(timestamp).getTime();
+  const msPerMinute = 60 * 1000;
+  const msPerHour = msPerMinute * 60;
+  const msPerDay = msPerHour * 24;
+
+  if (elapsed < msPerMinute) {
+    return 'just now';
+  } else if (elapsed < msPerHour) {
+    const mins = Math.round(elapsed / msPerMinute);
+    return mins === 1 ? '1 min ago' : `${mins} min ago`;
+  } else if (elapsed < msPerDay) {
+    const hrs = Math.round(elapsed / msPerHour);
+    return hrs === 1 ? '1 hour ago' : `${hrs} hours ago`;
+  } else {
+    const days = Math.round(elapsed / msPerDay);
+    return days === 1 ? '1 day ago' : `${days} days ago`;
+  }
+}
+
+function renderServerHistory() {
+  const container = document.getElementById('leftHistoryList');
+  if (!container) return;
+
+  if (serverHistory.length === 0) {
+    container.innerHTML = '<div class="history-empty">No history yet — your optimized prompts will appear here</div>';
+    return;
+  }
+
+  container.innerHTML = serverHistory.map(item => `
+    <div class="left-history-item" data-id="${item.id}">
+      <div class="left-history-meta">
+        <span class="left-history-provider ${item.provider}">${item.provider}</span>
+        <span class="left-history-date">${getRelativeTime(item.timestamp)}</span>
+      </div>
+      <div class="left-history-preview">${escapeHTML(item.rawText)}</div>
+      <div class="left-history-actions">
+        <button class="left-history-delete-btn" data-id="${item.id}" title="Delete entry" aria-label="Delete entry">
+          <svg viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  // Add click listener to each item to load the values
+  container.querySelectorAll('.left-history-item').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.left-history-delete-btn')) return;
+
+      const id = el.getAttribute('data-id');
+      const selected = serverHistory.find(x => x.id === id);
+      if (selected) {
+        document.getElementById('rawInput').value = selected.rawText;
+        
+        document.querySelectorAll('.provider-btn').forEach(btn => {
+          if (btn.getAttribute('data-provider') === selected.provider) {
+            btn.classList.add('active');
+            btn.setAttribute('aria-checked', 'true');
+          } else {
+            btn.classList.remove('active');
+            btn.setAttribute('aria-checked', 'false');
+          }
+        });
+        document.body.className = `theme-${selected.provider}`;
+
+        const tempVal = selected.temperature !== undefined ? selected.temperature : 0.5;
+        document.getElementById('tempSlider').value = tempVal;
+        document.getElementById('sliderValue').textContent = tempVal;
+
+        const outputPlaceholder = document.getElementById('outputPlaceholder');
+        const outputDisplay = document.getElementById('outputDisplay');
+        outputPlaceholder.style.display = 'none';
+        outputDisplay.style.display = 'block';
+        outputDisplay.textContent = selected.optimized;
+
+        const drawer = document.getElementById('leftHistoryDrawer');
+        drawer.classList.remove('active');
+        drawer.setAttribute('aria-hidden', 'true');
+        showAlert("Prompt run loaded from history.", "success");
+      }
+    });
+  });
+
+  // Add click listener to each delete button
+  container.querySelectorAll('.left-history-delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      await deleteHistoryItem(id);
+    });
+  });
+}
+
+async function deleteHistoryItem(id) {
+  try {
+    const response = await fetch(`/api/history/${id}`, { method: 'DELETE' });
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    await fetchHistory();
+    showAlert("History item deleted.", "success");
+  } catch (error) {
+    showAlert("Failed to delete history item.");
+  }
+}
+
+async function clearAllHistory() {
+  try {
+    const response = await fetch('/api/history', { method: 'DELETE' });
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    await fetchHistory();
+    showAlert("All history cleared.", "success");
+  } catch (error) {
+    showAlert("Failed to clear history.");
+  }
+}
+
+// --------------------------------------------------
 // UI LAYOUT & CONTROL FLOW
 // --------------------------------------------------
 function initUIListeners() {
@@ -336,6 +471,11 @@ function initUIListeners() {
   const historyToggle = document.getElementById('historyToggle');
   const historyDrawer = document.getElementById('historyDrawer');
   const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+
+  const leftHistoryBtn = document.getElementById('leftHistoryBtn');
+  const leftHistoryDrawer = document.getElementById('leftHistoryDrawer');
+  const leftDrawerCloseBtn = document.getElementById('leftDrawerCloseBtn');
+  const leftHistoryClearBtn = document.getElementById('leftHistoryClearBtn');
   
   const motionToggle = document.getElementById('motionToggle');
 
@@ -405,6 +545,30 @@ function initUIListeners() {
   drawerCloseBtn.addEventListener('click', () => {
     historyDrawer.classList.remove('active');
     historyDrawer.setAttribute('aria-hidden', 'true');
+  });
+
+  // Left Drawer History
+  leftHistoryBtn.addEventListener('click', () => {
+    fetchHistory();
+    leftHistoryDrawer.classList.add('active');
+    leftHistoryDrawer.setAttribute('aria-hidden', 'false');
+  });
+  leftDrawerCloseBtn.addEventListener('click', () => {
+    leftHistoryDrawer.classList.remove('active');
+    leftHistoryDrawer.setAttribute('aria-hidden', 'true');
+  });
+  leftHistoryClearBtn.addEventListener('click', () => {
+    clearAllHistory();
+  });
+
+  // Click outside to close left drawer
+  document.addEventListener('click', (e) => {
+    if (leftHistoryDrawer.classList.contains('active') && 
+        !leftHistoryDrawer.contains(e.target) && 
+        !leftHistoryBtn.contains(e.target)) {
+      leftHistoryDrawer.classList.remove('active');
+      leftHistoryDrawer.setAttribute('aria-hidden', 'true');
+    }
   });
 
   // Motion Toggle
@@ -569,6 +733,7 @@ async function processPromptEnhance(rawText) {
 
     const data = await response.json();
     optimizedPrompt = data.optimized;
+    fetchHistory();
   } catch (error) {
     console.warn("Backend enhance proxy error, running simulation fallback:", error);
     showAlert(`${error.message}. Running offline simulation fallback.`, "error");

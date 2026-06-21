@@ -9,6 +9,9 @@ const fetch = globalThis.fetch || require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// In-memory store for prompt history
+let promptHistory = [];
+
 // Enable CORS and JSON parsing
 app.use(cors());
 app.use(express.json());
@@ -117,12 +120,44 @@ app.post('/api/enhance', async (req, res) => {
       return res.status(400).json({ error: { message: `Unsupported provider: ${provider}` } });
     }
 
+    // Save to server history
+    const historyItem = {
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      rawText,
+      provider,
+      optimized: resultText,
+      temperature: tempVal,
+      timestamp: new Date().toISOString()
+    };
+    promptHistory.unshift(historyItem);
+    if (promptHistory.length > 100) {
+      promptHistory.pop();
+    }
+
     res.json({ optimized: resultText });
 
   } catch (error) {
     console.error("Enhance proxy error:", error.message);
     res.status(500).json({ error: { message: error.message } });
   }
+});
+
+// GET /api/history - returns last 50 history entries, newest first
+app.get('/api/history', (req, res) => {
+  res.json(promptHistory.slice(0, 50));
+});
+
+// DELETE /api/history/:id - removes a single entry
+app.delete('/api/history/:id', (req, res) => {
+  const { id } = req.params;
+  promptHistory = promptHistory.filter(item => item.id !== id);
+  res.json({ success: true });
+});
+
+// DELETE /api/history - clears all history
+app.delete('/api/history', (req, res) => {
+  promptHistory = [];
+  res.json({ success: true });
 });
 
 // Wildcard fallback to serve index.html for UI SPA routes
